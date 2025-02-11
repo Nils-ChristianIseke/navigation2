@@ -18,7 +18,6 @@
 #include <memory>
 #include <vector>
 #include <utility>
-
 #include "nav2_regulated_pure_pursuit_controller/parameter_handler.hpp"
 
 namespace nav2_regulated_pure_pursuit_controller
@@ -188,24 +187,57 @@ ParameterHandler::ParameterHandler(
       "it should be >0. Disabling cost regulated linear velocity scaling.");
     params_.use_cost_regulated_linear_velocity_scaling = false;
   }
-
-  dyn_params_handler_ = node->add_on_set_parameters_callback(
-    std::bind(
-      &ParameterHandler::dynamicParametersCallback,
-      this, std::placeholders::_1));
+  on_set_parameters_callback_handle_ = node->add_on_set_parameters_callback(
+      std::bind(&ParameterHandler::validateUpcomingParametersUpdate, this, std::placeholders::_1));
+  post_set_parameters_callback_handle_ = node->add_post_set_parameters_callback(
+      std::bind(&ParameterHandler::reactToUpdatedParametersCallback, this, std::placeholders::_1));
 }
-
 ParameterHandler::~ParameterHandler()
 {
   auto node = node_.lock();
-  if (dyn_params_handler_ && node) {
-    node->remove_on_set_parameters_callback(dyn_params_handler_.get());
+  if (on_set_parameters_callback_handle_ && node) {
+    node->remove_on_set_parameters_callback(on_set_parameters_callback_handle_.get());
   }
-  dyn_params_handler_.reset();
+  on_set_parameters_callback_handle_.reset();
+  if (post_set_parameters_callback_handle_ && node) {
+    node->remove_post_set_parameters_callback(post_set_parameters_callback_handle_.get());
+  }
+  post_set_parameters_callback_handle_.reset();
 }
 
-rcl_interfaces::msg::SetParametersResult
-ParameterHandler::dynamicParametersCallback(
+rcl_interfaces::msg::SetParametersResult ParameterHandler::validateUpcomingParametersUpdate(
+  std::vector<rclcpp::Parameter> parameters)
+{
+  rcl_interfaces::msg::SetParametersResult result;
+  result.successful = true;
+  bool use_rotate_to_heading;
+  bool allow_reversing;
+  for (const auto & param : parameters) {
+    if (param.get_name() == ".inflate_cost_scaling_factor") {
+      if (param.as_double() <= 0.0) {
+        result.successful = false;
+        result.reason =
+          "The value inflation_cost_scaling_factor is incorrectly set, it should be >0."
+          "Rejecting parameter updates.";
+        break;
+      }
+    }
+    if (param.get_name() == ".use_rotate_to_heading") {
+      use_rotate_to_heading = param.as_bool();
+    }
+    if (param.get_name() == ".allow_reversing") {
+      allow_reversing = param.as_bool();
+    }
+  }
+  if (use_rotate_to_heading && allow_reversing) {
+    result.successful = false;
+    result.reason = "Both .use_rotate_to_heading and .allow_reversing "
+      "parameter cannot be set to true. Rejecting parameter updates";
+  }
+  return result;
+}
+
+void ParameterHandler::reactToUpdatedParametersCallback(
   std::vector<rclcpp::Parameter> parameters)
 {
   rcl_interfaces::msg::SetParametersResult result;
@@ -217,12 +249,6 @@ ParameterHandler::dynamicParametersCallback(
 
     if (type == ParameterType::PARAMETER_DOUBLE) {
       if (name == plugin_name_ + ".inflation_cost_scaling_factor") {
-        if (parameter.as_double() <= 0.0) {
-          RCLCPP_WARN(
-            logger_, "The value inflation_cost_scaling_factor is incorrectly set, "
-            "it should be >0. Ignoring parameter update.");
-          continue;
-        }
         params_.inflation_cost_scaling_factor = parameter.as_double();
       } else if (name == plugin_name_ + ".desired_linear_vel") {
         params_.desired_linear_vel = parameter.as_double();
@@ -274,19 +300,10 @@ ParameterHandler::dynamicParametersCallback(
       } else if (name == plugin_name_ + ".use_cancel_deceleration") {
         params_.use_cancel_deceleration = parameter.as_bool();
       } else if (name == plugin_name_ + ".allow_reversing") {
-        if (params_.use_rotate_to_heading && parameter.as_bool()) {
-          RCLCPP_WARN(
-            logger_, "Both use_rotate_to_heading and allow_reversing "
-            "parameter cannot be set to true. Rejecting parameter update.");
-          continue;
-        }
         params_.allow_reversing = parameter.as_bool();
       }
     }
   }
-
-  result.successful = true;
-  return result;
 }
 
 }  // namespace nav2_regulated_pure_pursuit_controller
