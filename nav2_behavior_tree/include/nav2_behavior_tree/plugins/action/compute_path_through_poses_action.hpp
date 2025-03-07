@@ -63,9 +63,14 @@ public:
   BT::NodeStatus on_aborted() override;
 
   /**
-   * @brief Function to perform some user-defined operation upon cancelation of the action
+   * @brief Function to perform some user-defined operation upon cancellation of the action
    */
   BT::NodeStatus on_cancelled() override;
+
+  /**
+   * \brief Override required by the a BT action. Cancel the action and set the path output
+   */
+  void halt() override;
 
   /**
    * @brief Creates list of BT ports
@@ -86,6 +91,8 @@ public:
         BT::OutputPort<nav_msgs::msg::Path>("path", "Path created by ComputePathThroughPoses node"),
         BT::OutputPort<ActionResult::_error_code_type>(
           "error_code_id", "The compute path through poses error code"),
+        BT::OutputPort<std::string>(
+          "error_msg", "The compute path through poses error msg"),
       });
   }
 };

@@ -159,6 +159,7 @@ class TestDockingServer(unittest.TestCase):
 
         result = NavigateToPose.Result()
         result.error_code = 0
+        result.error_msg = ''
         return result
 
     def test_docking_server(self):
@@ -197,7 +198,7 @@ class TestDockingServer(unittest.TestCase):
         # Publish transform
         self.publish()
 
-        # Run for 1 seconds to allow tf to propogate
+        # Run for 1 seconds to allow tf to propagate
         for _ in range(10):
             rclpy.spin_once(self.node, timeout_sec=0.1)
             time.sleep(0.1)
