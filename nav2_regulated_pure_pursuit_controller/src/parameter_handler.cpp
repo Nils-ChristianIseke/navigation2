@@ -211,7 +211,6 @@ ParameterHandler::~ParameterHandler()
   }
   on_set_params_handler_.reset();
 }
-// Follow up on this example: https://github.com/ros2/demos/blob/rolling/demo_nodes_cpp/src/parameters/set_parameters_callback.cpp
 rcl_interfaces::msg::SetParametersResult ParameterHandler::validateParameterUpdatesCallback(
   std::vector<rclcpp::Parameter> parameters)
 {
