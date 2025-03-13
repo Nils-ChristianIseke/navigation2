@@ -183,6 +183,7 @@ ParameterHandler::ParameterHandler(
     std::bind(
       &ParameterHandler::modifyParametersCallback,
       this, std::placeholders::_1));
+
 }
 
 ParameterHandler::~ParameterHandler()
@@ -270,7 +271,7 @@ ParameterHandler::updateParametersCallback(
   for (const auto & parameter : parameters) {
     const auto & type = parameter.get_type();
     const auto & name = parameter.get_name();
-
+    // TODO: .transform_tolerance .max_robot_pose_search_dist .interpolate_curvature_after_goal
     if (type == ParameterType::PARAMETER_DOUBLE) {
       if (name == plugin_name_ + ".inflation_cost_scaling_factor") {
         params_.inflation_cost_scaling_factor = parameter.as_double();
