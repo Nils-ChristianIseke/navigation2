@@ -191,11 +191,11 @@ ParameterHandler::ParameterHandler(
 
   post_set_params_handler_ = node->add_post_set_parameters_callback(
     std::bind(
-      &ParameterHandler::reactToUpdatedParametersCallback,
+      &ParameterHandler::updateParametersCallback,
       this, std::placeholders::_1));
   on_set_params_handler_ = node->add_on_set_parameters_callback(
     std::bind(
-      &ParameterHandler::validateUpcomingParametersCallback,
+      &ParameterHandler::validateParameterUpdatesCallback,
       this, std::placeholders::_1));
 }
 
@@ -212,7 +212,7 @@ ParameterHandler::~ParameterHandler()
   on_set_params_handler_.reset();
 }
 // Follow up on this example: https://github.com/ros2/demos/blob/rolling/demo_nodes_cpp/src/parameters/set_parameters_callback.cpp
-rcl_interfaces::msg::SetParametersResult ParameterHandler::validateUpcomingParametersCallback(
+rcl_interfaces::msg::SetParametersResult ParameterHandler::validateParameterUpdatesCallback(
   std::vector<rclcpp::Parameter> parameters)
 {
   rcl_interfaces::msg::SetParametersResult result;
@@ -244,7 +244,7 @@ rcl_interfaces::msg::SetParametersResult ParameterHandler::validateUpcomingParam
   return result;
 }
 void
-ParameterHandler::reactToUpdatedParametersCallback(
+ParameterHandler::updateParametersCallback(
   std::vector<rclcpp::Parameter> parameters)
 {
   std::lock_guard<std::mutex> lock_reinit(mutex_);

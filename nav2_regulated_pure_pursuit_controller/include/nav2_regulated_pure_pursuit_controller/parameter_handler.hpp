@@ -94,9 +94,9 @@ protected:
    * @param event ParameterEvent message
    */
   void
-  reactToUpdatedParametersCallback(std::vector<rclcpp::Parameter> parameters);
+  updateParametersCallback(std::vector<rclcpp::Parameter> parameters);
   rcl_interfaces::msg::SetParametersResult
-  validateUpcomingParametersCallback(std::vector<rclcpp::Parameter> parameters);
+  validateParameterUpdatesCallback(std::vector<rclcpp::Parameter> parameters);
   // Dynamic parameters handler
   std::mutex mutex_;
   rclcpp::node_interfaces::PostSetParametersCallbackHandle::SharedPtr post_set_params_handler_;
