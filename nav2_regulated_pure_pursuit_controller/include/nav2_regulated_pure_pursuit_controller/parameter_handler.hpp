@@ -93,12 +93,14 @@ protected:
    * @brief Callback executed when a parameter change is detected
    * @param event ParameterEvent message
    */
+  void modifyParametersCallback(std::vector<rclcpp::Parameter> parameters);
   void
   updateParametersCallback(std::vector<rclcpp::Parameter> parameters);
   rcl_interfaces::msg::SetParametersResult
   validateParameterUpdatesCallback(std::vector<rclcpp::Parameter> parameters);
   // Dynamic parameters handler
   std::mutex mutex_;
+  rclcpp::node_interfaces::PreSetParametersCallbackHandle::SharedPtr pre_set_params_handler_;
   rclcpp::node_interfaces::PostSetParametersCallbackHandle::SharedPtr post_set_params_handler_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_params_handler_;
   Parameters params_;
