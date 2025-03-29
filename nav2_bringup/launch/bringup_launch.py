@@ -24,12 +24,12 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node, PushROSNamespace
 from launch_ros.descriptions import ParameterFile
 from nav2_common.launch import RewrittenYaml
-
+from pathlib import Path
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
-    launch_dir = os.path.join(bringup_dir, 'launch')
+    bringup_dir = Path(get_package_share_directory('nav2_bringup'))
+    launch_dir = bringup_dir / 'launch'
 
     # Create the launch configuration variables
     namespace = LaunchConfiguration('namespace')
@@ -90,7 +90,7 @@ def generate_launch_description():
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+        default_value=bringup_dir / 'params' / 'nav2_params.yaml',
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 
@@ -132,7 +132,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, 'slam_launch.py')
+                    launch_dir / 'slam_launch.py'
                 ),
                 condition=IfCondition(PythonExpression([slam, ' and ', use_localization])),
                 launch_arguments={
@@ -145,7 +145,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, 'localization_launch.py')
+                    launch_dir/ 'localization_launch.py'
                 ),
                 condition=IfCondition(PythonExpression(['not ', slam, ' and ', use_localization])),
                 launch_arguments={
@@ -161,7 +161,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, 'navigation_launch.py')
+                    launch_dir, 'navigation_launch.py'
                 ),
                 launch_arguments={
                     'namespace': namespace,

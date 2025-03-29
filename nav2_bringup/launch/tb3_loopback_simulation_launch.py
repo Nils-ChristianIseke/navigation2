@@ -14,7 +14,6 @@
 
 """This is all-in-one launch script intended for use by nav2 developers."""
 
-import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -25,14 +24,14 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, SetParameter
 from launch_ros.descriptions import ParameterFile
 from nav2_common.launch import RewrittenYaml
-
+from pathlib import Path
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
-    loopback_sim_dir = get_package_share_directory('nav2_loopback_sim')
-    launch_dir = os.path.join(bringup_dir, 'launch')
-    sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
+    bringup_dir = Path(get_package_share_directory('nav2_bringup'))
+    loopback_sim_dir = Path(get_package_share_directory('nav2_loopback_sim'))
+    launch_dir = bringup_dir / 'launch'
+    sim_dir = Path(get_package_share_directory('nav2_minimal_tb3_sim'))
 
     # Create the launch configuration variables
     namespace = LaunchConfiguration('namespace')
@@ -56,12 +55,12 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(bringup_dir, 'maps', 'tb3_sandbox.yaml'),
+        default_value=bringup_dir / 'maps' / 'tb3_sandbox.yaml',
     )
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+        default_value=bringup_dir / 'params' / 'nav2_params.yaml',
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 
@@ -85,7 +84,7 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config_file',
-        default_value=os.path.join(bringup_dir, 'rviz', 'nav2_default_view.rviz'),
+        default_value=bringup_dir / 'rviz' / 'nav2_default_view.rviz',
         description='Full path to the RVIZ config file to use',
     )
 
@@ -99,8 +98,8 @@ def generate_launch_description():
         'use_rviz', default_value='True', description='Whether to start RVIZ'
     )
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
-    with open(urdf, 'r') as infp:
+    urdf = sim_dir / 'urdf' / 'turtlebot3_waffle.urdf'
+    with urdf.open('r') as infp:
         robot_description = infp.read()
 
     start_robot_state_publisher_cmd = Node(
@@ -117,7 +116,7 @@ def generate_launch_description():
     )
 
     rviz_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'rviz_launch.py')),
+        PythonLaunchDescriptionSource(launch_dir / 'rviz_launch.py'),
         condition=IfCondition(use_rviz),
         launch_arguments={
             'namespace': namespace,
@@ -127,7 +126,7 @@ def generate_launch_description():
     )
 
     bringup_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'bringup_launch.py')),
+        PythonLaunchDescriptionSource(launch_dir, 'bringup_launch.py'),
         launch_arguments={
             'namespace': namespace,
             'map': map_yaml_file,

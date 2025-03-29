@@ -26,13 +26,13 @@ from launch.event_handlers import OnShutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
-
+from pathlib import Path
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
-    launch_dir = os.path.join(bringup_dir, 'launch')
-    sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
+    bringup_dir = Path(get_package_share_directory('nav2_bringup'))
+    launch_dir = bringup_dir / 'launch'
+    sim_dir = Path(get_package_share_directory('nav2_minimal_tb3_sim'))
 
     # Create the launch configuration variables
     slam = LaunchConfiguration('slam')
@@ -75,7 +75,7 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(bringup_dir, 'maps', 'tb3_sandbox.yaml'),
+        default_value=bringup_dir / 'maps' / 'tb3_sandbox.yaml',
     )
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
@@ -86,7 +86,7 @@ def generate_launch_description():
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+        default_value=bringup_dir / 'params' / 'nav2_params.yaml',
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 
@@ -110,7 +110,7 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config_file',
-        default_value=os.path.join(bringup_dir, 'rviz', 'nav2_default_view.rviz'),
+        default_value=bringup_dir / 'rviz' / 'nav2_default_view.rviz',
         description='Full path to the RVIZ config file to use',
     )
 
@@ -136,7 +136,7 @@ def generate_launch_description():
 
     declare_world_cmd = DeclareLaunchArgument(
         'world',
-        default_value=os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro'),
+        default_value=sim_dir / 'worlds' / 'tb3_sandbox.sdf.xacro',
         description='Full path to world model file to load',
     )
 

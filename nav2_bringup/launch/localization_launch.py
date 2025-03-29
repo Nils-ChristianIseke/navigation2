@@ -23,11 +23,11 @@ from launch.substitutions import (EqualsSubstitution, LaunchConfiguration, NotEq
 from launch_ros.actions import LoadComposableNodes, Node, SetParameter
 from launch_ros.descriptions import ComposableNode, ParameterFile
 from nav2_common.launch import RewrittenYaml
-
+from pathlib import Path
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
+    bringup_dir = Path(get_package_share_directory('nav2_bringup'))
 
     namespace = LaunchConfiguration('namespace')
     map_yaml_file = LaunchConfiguration('map')
@@ -80,7 +80,7 @@ def generate_launch_description():
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+        default_value= bringup_dir / 'params' / 'nav2_params.yaml',
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 

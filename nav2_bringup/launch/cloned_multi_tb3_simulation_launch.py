@@ -14,7 +14,6 @@
 # limitations under the License.
 
 
-import os
 from pathlib import Path
 import tempfile
 
@@ -51,8 +50,8 @@ def count_robots(context: LaunchContext) -> list[LogInfo]:
 
 def generate_robot_actions(name: str = '', pose: dict = {}) -> list[GroupAction]:
     """Generate the actions to launch a robot with the given name and pose."""
-    bringup_dir = get_package_share_directory('nav2_bringup')
-    launch_dir = os.path.join(bringup_dir, 'launch')
+    bringup_dir = Path(get_package_share_directory('nav2_bringup'))
+    launch_dir = bringup_dir / 'launch'
     use_rviz = LaunchConfiguration('use_rviz')
     params_file = LaunchConfiguration('params_file')
     autostart = LaunchConfiguration('autostart')
@@ -68,7 +67,7 @@ def generate_robot_actions(name: str = '', pose: dict = {}) -> list[GroupAction]
                 ),
                 IncludeLaunchDescription(
                     PythonLaunchDescriptionSource(
-                        os.path.join(launch_dir, 'rviz_launch.py')
+                        launch_dir / 'rviz_launch.py'
                     ),
                     condition=IfCondition(use_rviz),
                     launch_arguments={
@@ -78,7 +77,7 @@ def generate_robot_actions(name: str = '', pose: dict = {}) -> list[GroupAction]
                 ),
                 IncludeLaunchDescription(
                     PythonLaunchDescriptionSource(
-                        os.path.join(bringup_dir, 'launch', 'tb3_simulation_launch.py')
+                        bringup_dir / 'launch' / 'tb3_simulation_launch.py'
                     ),
                     launch_arguments={
                         'namespace': name,
@@ -119,8 +118,8 @@ def generate_launch_description():
                                     roll: 0.0, pitch: 1.5707, yaw: 1.5707}}'
     """
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
-    sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
+    bringup_dir = Path(get_package_share_directory('nav2_bringup'))
+    sim_dir = Path(get_package_share_directory('nav2_minimal_tb3_sim'))
 
     # Simulation settings
     world = LaunchConfiguration('world')
@@ -136,7 +135,7 @@ def generate_launch_description():
     # Declare the launch arguments
     declare_world_cmd = DeclareLaunchArgument(
         'world',
-        default_value=os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro'),
+        default_value=sim_dir / 'worlds'/ 'tb3_sandbox.sdf.xacro',
         description='Full path to world file to load',
     )
 
@@ -151,14 +150,14 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(bringup_dir, 'maps', 'tb3_sandbox.yaml'),
+        default_value= bringup_dir / 'maps' / 'tb3_sandbox.yaml',
         description='Full path to map file to load',
     )
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(
-            bringup_dir, 'params', 'nav2_params.yaml'
+        default_value=(
+            bringup_dir / 'params'/ 'nav2_params.yaml'
         ),
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
@@ -171,8 +170,7 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config',
-        default_value=os.path.join(
-            bringup_dir, 'rviz', 'nav2_default_view.rviz'),
+        default_value= bringup_dir / 'rviz' / 'nav2_default_view.rviz',
         description='Full path to the RVIZ config file to use.',
     )
 
@@ -201,10 +199,10 @@ def generate_launch_description():
         ]))
 
     set_env_vars_resources = AppendEnvironmentVariable(
-        'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models'))
+        'GZ_SIM_RESOURCE_PATH', sim_dir / 'models')
     set_env_vars_resources2 = AppendEnvironmentVariable(
             'GZ_SIM_RESOURCE_PATH',
-            str(Path(os.path.join(sim_dir)).parent.resolve()))
+            str(sim_dir.parent.resolve()))
 
     # Create the launch description and populate
     ld = LaunchDescription()
