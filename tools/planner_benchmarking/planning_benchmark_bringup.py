@@ -26,7 +26,7 @@ def generate_launch_description():
     config = os.path.join(
         get_package_share_directory('nav2_bringup'), 'params', 'nav2_params.yaml'
     )
-    map_file = os.path.join(nav2_bringup_dir, 'maps', 'tb3_sandbox.yaml')
+    map_file = nav2_bringup_dir / 'tb3_sandbox.yaml'
     lifecycle_nodes = ['map_server', 'planner_server']
 
     return LaunchDescription(
@@ -92,7 +92,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(nav2_bringup_dir, 'launch', 'rviz_launch.py')
+                    nav2_bringup_dir / 'rviz_launch.py'
                 ),
                 launch_arguments={'namespace': ''}.items(),
             ),

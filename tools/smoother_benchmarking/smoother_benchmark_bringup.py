@@ -24,11 +24,11 @@ from launch_ros.actions import Node
 def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
     benchmark_dir = os.getcwd()
-    metrics_py = os.path.join(benchmark_dir, 'metrics.py')
+    metrics_py = benchmark_dir / 'metrics.py'
     config = os.path.join(
         get_package_share_directory('nav2_bringup'), 'params', 'nav2_params.yaml'
     )
-    map_file = os.path.join(benchmark_dir, 'maps', 'smoothers_world.yaml')
+    map_file = benchmark_dir / 'smoothers_world.yaml'
     lifecycle_nodes = ['map_server', 'planner_server', 'smoother_server']
 
     static_transform_one = Node(
@@ -105,7 +105,7 @@ def generate_launch_description():
 
     rviz_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(nav2_bringup_dir, 'launch', 'rviz_launch.py')
+            nav2_bringup_dir / 'rviz_launch.py'
         ),
         launch_arguments={'namespace': ''}.items(),
     )

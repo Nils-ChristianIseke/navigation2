@@ -146,11 +146,11 @@ def generate_launch_description():
 
     declare_robot_sdf_cmd = DeclareLaunchArgument(
         'robot_sdf',
-        default_value=os.path.join(sim_dir, 'urdf', 'gz_waffle.sdf.xacro'),
+        default_value=sim_dir / 'gz_waffle.sdf.xacro',
         description='Full path to robot sdf file to spawn the robot in gazebo',
     )
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
+    urdf = sim_dir / 'turtlebot3_waffle.urdf'
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
@@ -168,7 +168,7 @@ def generate_launch_description():
     )
 
     rviz_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'rviz_launch.py')),
+        PythonLaunchDescriptionSource(launch_dir / 'rviz_launch.py'),
         condition=IfCondition(use_rviz),
         launch_arguments={
             'namespace': namespace,
@@ -178,7 +178,7 @@ def generate_launch_description():
     )
 
     bringup_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'bringup_launch.py')),
+        PythonLaunchDescriptionSource(launch_dir / 'bringup_launch.py'),
         launch_arguments={
             'namespace': namespace,
             'slam': slam,
@@ -211,7 +211,7 @@ def generate_launch_description():
 
     gazebo_client = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros_gz_sim'),
+            get_package_share_directory('ros_gz_sim' / ,
                          'launch',
                          'gz_sim.launch.py')
         ),
@@ -222,7 +222,7 @@ def generate_launch_description():
 
     gz_robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(sim_dir, 'launch', 'spawn_tb3.launch.py')),
+            sim_dir / 'spawn_tb3.launch.py'),
         launch_arguments={'namespace': namespace,
                           'use_sim_time': use_sim_time,
                           'robot_name': robot_name,

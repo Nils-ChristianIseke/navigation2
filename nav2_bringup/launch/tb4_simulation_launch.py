@@ -31,7 +31,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     # Get the launch directory
     bringup_dir = get_package_share_directory('nav2_bringup')
-    launch_dir = os.path.join(bringup_dir, 'launch')
+    launch_dir = bringup_dir / 'launch'
     # This checks that tb4 exists needed for the URDF / simulation files.
     # If not using TB4, its safe to remove.
     sim_dir = get_package_share_directory('nav2_minimal_tb4_sim')
@@ -78,7 +78,7 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(bringup_dir, 'maps', 'depot.yaml'),  # Try warehouse.yaml!
+        default_value=bringup_dir / 'depot.yaml',  # Try warehouse.yaml!
         description='Full path to map file to load',
     )
 
@@ -90,7 +90,7 @@ def generate_launch_description():
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+        default_value=bringup_dir / 'nav2_params.yaml',
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 
@@ -114,7 +114,7 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config_file',
-        default_value=os.path.join(bringup_dir, 'rviz', 'nav2_default_view.rviz'),
+        default_value=bringup_dir / 'nav2_default_view.rviz',
         description='Full path to the RVIZ config file to use',
     )
 
@@ -140,7 +140,7 @@ def generate_launch_description():
 
     declare_world_cmd = DeclareLaunchArgument(
         'world',
-        default_value=os.path.join(sim_dir, 'worlds', 'depot.sdf'),  # Try warehouse.sdf!
+        default_value=sim_dir / 'depot.sdf',  # Try warehouse.sdf!
         description='Full path to world model file to load',
     )
 
@@ -150,7 +150,7 @@ def generate_launch_description():
 
     declare_robot_sdf_cmd = DeclareLaunchArgument(
         'robot_sdf',
-        default_value=os.path.join(desc_dir, 'urdf', 'standard', 'turtlebot4.urdf.xacro'),
+        default_value=desc_dir / 'turtlebot4.urdf.xacro',
         description='Full path to robot sdf file to spawn the robot in gazebo',
     )
 
@@ -168,7 +168,7 @@ def generate_launch_description():
     )
 
     rviz_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'rviz_launch.py')),
+        PythonLaunchDescriptionSource(launch_dir / 'rviz_launch.py'),
         condition=IfCondition(use_rviz),
         launch_arguments={
             'namespace': namespace,
@@ -178,7 +178,7 @@ def generate_launch_description():
     )
 
     bringup_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'bringup_launch.py')),
+        PythonLaunchDescriptionSource(launch_dir / 'bringup_launch.py'),
         launch_arguments={
             'namespace': namespace,
             'slam': slam,
@@ -212,11 +212,11 @@ def generate_launch_description():
 
     set_env_vars_resources = AppendEnvironmentVariable(
             'GZ_SIM_RESOURCE_PATH',
-            os.path.join(sim_dir, 'worlds'))
+            sim_dir / 'worlds')
     gazebo_client = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros_gz_sim'),
-                         'launch',
+            get_package_share_directory('ros_gz_sim' / 
+                         'launch' /
                          'gz_sim.launch.py')
         ),
         condition=IfCondition(PythonExpression(
@@ -226,7 +226,7 @@ def generate_launch_description():
 
     gz_robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(sim_dir, 'launch', 'spawn_tb4.launch.py')),
+            sim_dir / 'spawn_tb4.launch.py'),
         launch_arguments={'namespace': namespace,
                           'use_simulator': use_simulator,
                           'use_sim_time': use_sim_time,
