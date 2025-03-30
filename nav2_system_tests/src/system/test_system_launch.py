@@ -34,14 +34,14 @@ def generate_launch_description():
     sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
 
-    world_sdf_xacro = os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro')
-    robot_sdf = os.path.join(sim_dir, 'urdf', 'gz_waffle.sdf.xacro')
+    world_sdf_xacro = sim_dir / 'tb3_sandbox.sdf.xacro'
+    robot_sdf = sim_dir / 'gz_waffle.sdf.xacro'
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
+    urdf = sim_dir / 'turtlebot3_waffle.urdf'
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
-    map_yaml_file = os.path.join(nav2_bringup_dir, 'maps', 'tb3_sandbox.yaml')
+    map_yaml_file = nav2_bringup_dir / 'tb3_sandbox.yaml'
 
     bt_navigator_xml = os.path.join(
         get_package_share_directory('nav2_bt_navigator'),
@@ -51,7 +51,7 @@ def generate_launch_description():
 
     # Use local param file
     launch_dir = os.path.dirname(os.path.realpath(__file__))
-    params_file = os.path.join(launch_dir, 'nav2_system_params.yaml')
+    params_file = launch_dir / 'nav2_system_params.yaml'
 
     # Replace the default parameter values for testing special features
     # without having multiple params_files inside the nav2 stack
@@ -82,11 +82,11 @@ def generate_launch_description():
             SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
             SetEnvironmentVariable('RCUTILS_LOGGING_USE_STDOUT', '1'),
             AppendEnvironmentVariable(
-                'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models')
+                'GZ_SIM_RESOURCE_PATH', sim_dir / 'models'
             ),
             AppendEnvironmentVariable(
                 'GZ_SIM_RESOURCE_PATH',
-                str(Path(os.path.join(sim_dir)).parent.resolve())
+                str(Path(sim_dir / ).parent.resolve())
             ),
             ExecuteProcess(
                 cmd=['gz', 'sim', '-r', '-s', world_sdf_xacro],
@@ -94,7 +94,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(sim_dir, 'launch', 'spawn_tb3.launch.py')
+                    sim_dir / 'spawn_tb3.launch.py'
                 ),
                 launch_arguments={
                     'use_sim_time': 'True',
@@ -118,7 +118,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(nav2_bringup_dir, 'launch', 'bringup_launch.py')
+                    nav2_bringup_dir / 'bringup_launch.py'
                 ),
                 launch_arguments={
                     'namespace': '',
@@ -139,7 +139,7 @@ def main(argv=sys.argv[1:]):
 
     test1_action = ExecuteProcess(
         cmd=[
-            os.path.join(os.getenv('TEST_DIR'), os.getenv('TESTER')),
+            os.getenv('TEST_DIR' / , os.getenv('TESTER')),
             '-r',
             '-2.0',
             '-0.5',

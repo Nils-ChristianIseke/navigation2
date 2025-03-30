@@ -122,7 +122,7 @@ def generate_launch_description():
                 PushROSNamespace(robot['name']),
                 IncludeLaunchDescription(
                     PythonLaunchDescriptionSource(
-                        os.path.join(bringup_dir, 'launch', 'bringup_launch.py')
+                        bringup_dir / 'bringup_launch.py'
                     ),
                     launch_arguments={
                         'namespace': robot['name'],
@@ -163,7 +163,7 @@ def main(argv=sys.argv[1:]):
     # TODO(orduno) remove duplicated definition of robots on `generate_launch_description`
     test1_action = ExecuteProcess(
         cmd=[
-            os.path.join(os.getenv('TEST_DIR'), os.getenv('TESTER')),
+            os.getenv('TEST_DIR' / , os.getenv('TESTER')),
             '-rs',
             'robot1',
             '0.0',

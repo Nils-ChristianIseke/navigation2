@@ -25,7 +25,7 @@ def generate_launch_description():
     # Configuration parameters for the launch
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
 
-    map_yaml_file = os.path.join(nav2_bringup_dir, 'maps', 'tb3_sandbox.yaml')
+    map_yaml_file = nav2_bringup_dir / 'tb3_sandbox.yaml'
 
     # Specify the actions
     start_tf_cmd_1 = Node(
@@ -94,7 +94,7 @@ def generate_launch_description():
 
     nav2_bringup = launch.actions.IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(nav2_bringup_dir, 'launch', 'bringup_launch.py')),
+            nav2_bringup_dir / 'bringup_launch.py'),
         launch_arguments={
             'map': map_yaml_file,
             'use_sim_time': 'True',

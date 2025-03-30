@@ -31,21 +31,21 @@ def main(argv=sys.argv[1:]):
     sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
 
-    world_sdf_xacro = os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro')
-    robot_sdf = os.path.join(sim_dir, 'urdf', 'gz_waffle.sdf.xacro')
+    world_sdf_xacro = sim_dir / 'tb3_sandbox.sdf.xacro'
+    robot_sdf = sim_dir / 'gz_waffle.sdf.xacro'
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
+    urdf = sim_dir / 'turtlebot3_waffle.urdf'
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
-    map_yaml_file = os.path.join(nav2_bringup_dir, 'maps', 'tb3_sandbox.yaml')
+    map_yaml_file = nav2_bringup_dir / 'tb3_sandbox.yaml'
 
     set_env_vars_resources = AppendEnvironmentVariable(
-        'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models')
+        'GZ_SIM_RESOURCE_PATH', sim_dir / 'models'
     )
     set_env_vars_resources2 = AppendEnvironmentVariable(
         'GZ_SIM_RESOURCE_PATH',
-        str(Path(os.path.join(sim_dir)).parent.resolve())
+        str(Path(sim_dir / ).parent.resolve())
     )
 
     start_gazebo_server = ExecuteProcess(
@@ -55,7 +55,7 @@ def main(argv=sys.argv[1:]):
 
     spawn_robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(sim_dir, 'launch', 'spawn_tb3.launch.py')
+            sim_dir / 'spawn_tb3.launch.py'
         ),
         launch_arguments={
             'use_sim_time': 'True',

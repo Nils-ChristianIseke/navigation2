@@ -35,14 +35,14 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
     nav2_sys_test_dir = get_package_share_directory('nav2_system_tests')
 
-    world_sdf_xacro = os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro')
-    robot_sdf = os.path.join(sim_dir, 'urdf', 'gz_waffle.sdf.xacro')
+    world_sdf_xacro = sim_dir / 'tb3_sandbox.sdf.xacro'
+    robot_sdf = sim_dir / 'gz_waffle.sdf.xacro'
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
+    urdf = sim_dir / 'turtlebot3_waffle.urdf'
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
-    map_yaml_file = os.path.join(nav2_sys_test_dir, 'maps', 'map_circular.yaml')
+    map_yaml_file = nav2_sys_test_dir / 'map_circular.yaml'
     filter_mask_file = os.getenv('TEST_MASK')
 
     bt_navigator_xml = os.path.join(
@@ -73,11 +73,11 @@ def generate_launch_description():
             SetEnvironmentVariable('RCUTILS_LOGGING_USE_STDOUT', '1'),
             # Launch gazebo server for simulation
             AppendEnvironmentVariable(
-                'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models')
+                'GZ_SIM_RESOURCE_PATH', sim_dir / 'models'
             ),
             AppendEnvironmentVariable(
                 'GZ_SIM_RESOURCE_PATH',
-                str(Path(os.path.join(sim_dir)).parent.resolve())
+                str(Path(sim_dir / ).parent.resolve())
             ),
             ExecuteProcess(
                 cmd=['gz', 'sim', '-r', '-s', world_sdf_xacro],
@@ -85,7 +85,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(sim_dir, 'launch', 'spawn_tb3.launch.py')
+                    sim_dir / 'spawn_tb3.launch.py'
                 ),
                 launch_arguments={
                     'use_sim_time': 'True',
@@ -139,7 +139,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(nav2_bringup_dir, 'launch', 'bringup_launch.py')
+                    nav2_bringup_dir / 'bringup_launch.py'
                 ),
                 launch_arguments={
                     'namespace': '',
@@ -160,7 +160,7 @@ def main(argv=sys.argv[1:]):
 
     test1_action = ExecuteProcess(
         cmd=[
-            os.path.join(os.getenv('TEST_DIR'), 'tester_node.py'),
+            os.getenv('TEST_DIR' / , 'tester_node.py'),
             '-t',
             'speed',
             '-r',

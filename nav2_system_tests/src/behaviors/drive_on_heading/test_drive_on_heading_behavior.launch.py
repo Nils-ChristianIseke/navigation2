@@ -32,9 +32,9 @@ def generate_launch_description():
     bringup_dir = get_package_share_directory('nav2_bringup')
     sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
     params_file = LaunchConfiguration('params_file')
-    world_sdf_xacro = os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro')
-    robot_sdf = os.path.join(sim_dir, 'urdf', 'gz_waffle.sdf.xacro')
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
+    world_sdf_xacro = sim_dir / 'tb3_sandbox.sdf.xacro'
+    robot_sdf = sim_dir / 'gz_waffle.sdf.xacro'
+    urdf = sim_dir / 'turtlebot3_waffle.urdf'
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
@@ -53,16 +53,16 @@ def generate_launch_description():
             SetEnvironmentVariable('RCUTILS_LOGGING_USE_STDOUT', '1'),
             DeclareLaunchArgument(
                 'params_file',
-                default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+                default_value=bringup_dir / 'nav2_params.yaml',
                 description='Full path to the ROS2 parameters file to use',
             ),
             # Simulation for odometry
             AppendEnvironmentVariable(
-                'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models')
+                'GZ_SIM_RESOURCE_PATH', sim_dir / 'models'
             ),
             AppendEnvironmentVariable(
                 'GZ_SIM_RESOURCE_PATH',
-                str(Path(os.path.join(sim_dir)).parent.resolve())
+                str(Path(sim_dir / ).parent.resolve())
             ),
             ExecuteProcess(
                 cmd=['gz', 'sim', '-r', '-s', world_sdf_xacro],
@@ -70,7 +70,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(sim_dir, 'launch', 'spawn_tb3.launch.py')
+                    sim_dir / 'spawn_tb3.launch.py'
                 ),
                 launch_arguments={
                     'use_sim_time': 'True',

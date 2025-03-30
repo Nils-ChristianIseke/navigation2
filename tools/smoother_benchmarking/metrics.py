@@ -141,14 +141,14 @@ def main():
 
     print('Write Results...')
     benchmark_dir = os.getcwd()
-    with open(os.path.join(benchmark_dir, 'results.pickle'), 'wb') as f:
+    with open(benchmark_dir / 'results.pickle', 'wb') as f:
         pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
 
-    with open(os.path.join(benchmark_dir, 'costmap.pickle'), 'wb') as f:
+    with open(benchmark_dir / 'costmap.pickle', 'wb') as f:
         pickle.dump(costmap_msg, f, pickle.HIGHEST_PROTOCOL)
 
     smoothers.insert(0, planner)
-    with open(os.path.join(benchmark_dir, 'methods.pickle'), 'wb') as f:
+    with open(benchmark_dir / 'methods.pickle', 'wb') as f:
         pickle.dump(smoothers, f, pickle.HIGHEST_PROTOCOL)
     print('Write Complete')
 

@@ -31,17 +31,17 @@ def generate_launch_description():
     sim_dir = get_package_share_directory('nav2_minimal_tb3_sim')
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
 
-    world_sdf_xacro = os.path.join(sim_dir, 'worlds', 'tb3_empty_world.sdf.xacro')
-    robot_sdf = os.path.join(sim_dir, 'urdf', 'gz_waffle_gps.sdf.xacro')
+    world_sdf_xacro = sim_dir / 'tb3_empty_world.sdf.xacro'
+    robot_sdf = sim_dir / 'gz_waffle_gps.sdf.xacro'
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle_gps.urdf')
+    urdf = sim_dir / 'turtlebot3_waffle_gps.urdf'
 
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
     # use local param file
     launch_dir = os.path.dirname(os.path.realpath(__file__))
-    params_file = os.path.join(launch_dir, 'nav2_no_map_params.yaml')
+    params_file = launch_dir / 'nav2_no_map_params.yaml'
 
     configured_params = RewrittenYaml(
         source_file=params_file,
@@ -55,11 +55,11 @@ def generate_launch_description():
             SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
             SetEnvironmentVariable('RCUTILS_LOGGING_USE_STDOUT', '1'),
             AppendEnvironmentVariable(
-                'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models')
+                'GZ_SIM_RESOURCE_PATH', sim_dir / 'models'
             ),
             AppendEnvironmentVariable(
                 'GZ_SIM_RESOURCE_PATH',
-                str(Path(os.path.join(sim_dir)).parent.resolve()),
+                str(Path(sim_dir / ).parent.resolve()),
             ),
             ExecuteProcess(
                 cmd=['gz', 'sim', '-r', '-s', world_sdf_xacro],
@@ -67,7 +67,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(sim_dir, 'launch', 'spawn_tb3_gps.launch.py')
+                    sim_dir / 'spawn_tb3_gps.launch.py'
                 ),
                 launch_arguments={
                     'use_sim_time': 'True',
@@ -91,7 +91,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(nav2_bringup_dir, 'launch', 'navigation_launch.py')
+                    nav2_bringup_dir / 'navigation_launch.py'
                 ),
                 launch_arguments={
                     'namespace': '',
@@ -103,7 +103,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, 'dual_ekf_navsat.launch.py')
+                    launch_dir / 'dual_ekf_navsat.launch.py'
                 ),
             ),
         ]
@@ -114,7 +114,7 @@ def main(argv=sys.argv[1:]):
     ld = generate_launch_description()
 
     test1_action = ExecuteProcess(
-        cmd=[os.path.join(os.getenv('TEST_DIR'), 'tester.py')],
+        cmd=[os.getenv('TEST_DIR' / , 'tester.py')],
         name='tester_node',
         output='screen',
     )

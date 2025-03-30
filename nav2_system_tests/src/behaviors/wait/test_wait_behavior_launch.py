@@ -33,14 +33,14 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
     ros_gz_sim_dir = get_package_share_directory('ros_gz_sim')
 
-    world_sdf_xacro = os.path.join(sim_dir, 'worlds', 'tb3_sandbox.sdf.xacro')
-    robot_sdf = os.path.join(sim_dir, 'urdf', 'gz_waffle.sdf.xacro')
+    world_sdf_xacro = sim_dir / 'tb3_sandbox.sdf.xacro'
+    robot_sdf = sim_dir / 'gz_waffle.sdf.xacro'
 
-    urdf = os.path.join(sim_dir, 'urdf', 'turtlebot3_waffle.urdf')
+    urdf = sim_dir / 'turtlebot3_waffle.urdf'
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
-    map_yaml_file = os.path.join(nav2_bringup_dir, 'maps', 'tb3_sandbox.yaml')
+    map_yaml_file = nav2_bringup_dir / 'tb3_sandbox.yaml'
 
     bt_navigator_xml = os.path.join(
         get_package_share_directory('nav2_bt_navigator'),
@@ -49,7 +49,7 @@ def generate_launch_description():
     )
 
     bringup_dir = get_package_share_directory('nav2_bringup')
-    params_file = os.path.join(bringup_dir, 'params/nav2_params.yaml')
+    params_file = bringup_dir / 'params/nav2_params.yaml'
 
     # Replace the `use_astar` setting on the params file
     configured_params = RewrittenYaml(
@@ -61,21 +61,21 @@ def generate_launch_description():
             SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
             SetEnvironmentVariable('RCUTILS_LOGGING_USE_STDOUT', '1'),
             AppendEnvironmentVariable(
-                'GZ_SIM_RESOURCE_PATH', os.path.join(sim_dir, 'models')
+                'GZ_SIM_RESOURCE_PATH', sim_dir / 'models'
             ),
             AppendEnvironmentVariable(
                 'GZ_SIM_RESOURCE_PATH',
-                str(Path(os.path.join(sim_dir)).parent.resolve())
+                str(Path(sim_dir / ).parent.resolve())
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(ros_gz_sim_dir, 'launch', 'gz_sim.launch.py')
+                    ros_gz_sim_dir / 'gz_sim.launch.py'
                 ),
                 launch_arguments={'gz_args': ['-r -s ', world_sdf_xacro]}.items(),
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(sim_dir, 'launch', 'spawn_tb3.launch.py')
+                    sim_dir / 'spawn_tb3.launch.py'
                 ),
                 launch_arguments={
                     'use_sim_time': 'True',
@@ -99,7 +99,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(bringup_dir, 'launch', 'bringup_launch.py')
+                    bringup_dir / 'bringup_launch.py'
                 ),
                 launch_arguments={
                     'map': map_yaml_file,

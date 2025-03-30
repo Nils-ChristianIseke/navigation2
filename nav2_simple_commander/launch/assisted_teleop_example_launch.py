@@ -33,9 +33,9 @@ def generate_launch_description():
     sim_dir = get_package_share_directory('nav2_minimal_tb4_sim')
     desc_dir = get_package_share_directory('nav2_minimal_tb4_description')
 
-    robot_sdf = os.path.join(desc_dir, 'urdf', 'standard', 'turtlebot4.urdf.xacro')
-    world = os.path.join(sim_dir, 'worlds', 'depot.sdf')
-    map_yaml_file = os.path.join(nav2_bringup_dir, 'maps', 'depot.yaml')
+    robot_sdf = desc_dir / 'turtlebot4.urdf.xacro'
+    world = sim_dir / 'depot.sdf'
+    map_yaml_file = nav2_bringup_dir / 'depot.yaml'
 
     # Launch configuration variables
     use_rviz = LaunchConfiguration('use_rviz')
@@ -56,7 +56,7 @@ def generate_launch_description():
         cmd=['xacro', '-o', world_sdf, ['headless:=', headless], world])
     start_gazebo_server_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros_gz_sim'), 'launch',
+            get_package_share_directory('ros_gz_sim' / , 'launch',
                          'gz_sim.launch.py')),
         launch_arguments={'gz_args': ['-r -s ', world_sdf]}.items())
 
@@ -67,10 +67,10 @@ def generate_launch_description():
 
     set_env_vars_resources = AppendEnvironmentVariable(
             'GZ_SIM_RESOURCE_PATH',
-            os.path.join(sim_dir, 'worlds'))
+            sim_dir / 'worlds')
     start_gazebo_client_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros_gz_sim'),
+            get_package_share_directory('ros_gz_sim' / ,
                          'launch',
                          'gz_sim.launch.py')
         ),
@@ -81,7 +81,7 @@ def generate_launch_description():
 
     spawn_robot_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(sim_dir, 'launch', 'spawn_tb4.launch.py')),
+            sim_dir / 'spawn_tb4.launch.py'),
         launch_arguments={'use_sim_time': 'True',
                           'robot_sdf': robot_sdf,
                           'x_pose': '-8.0',
@@ -104,7 +104,7 @@ def generate_launch_description():
     # start the visualization
     rviz_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(nav2_bringup_dir, 'launch', 'rviz_launch.py')
+            nav2_bringup_dir / 'rviz_launch.py'
         ),
         condition=IfCondition(use_rviz),
         launch_arguments={'namespace': ''}.items(),
@@ -113,7 +113,7 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(nav2_bringup_dir, 'launch', 'bringup_launch.py')
+            nav2_bringup_dir / 'bringup_launch.py'
         ),
         launch_arguments={'map': map_yaml_file, 'use_sim_time': 'True'}.items(),
     )
@@ -128,7 +128,7 @@ def generate_launch_description():
 
     set_env_vars_resources2 = AppendEnvironmentVariable(
             'GZ_SIM_RESOURCE_PATH',
-            str(Path(os.path.join(desc_dir)).parent.resolve()))
+            str(Path(desc_dir / ).parent.resolve()))
 
     ld = LaunchDescription()
     ld.add_action(declare_use_rviz_cmd)

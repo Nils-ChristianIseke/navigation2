@@ -23,7 +23,7 @@ from launch_testing.legacy import LaunchTestService
 
 
 def generate_launch_description():
-    params_file = os.path.join(os.getenv('TEST_DIR'), 'error_code_param.yaml')
+    params_file = os.getenv('TEST_DIR' / , 'error_code_param.yaml')
 
     remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
 
@@ -107,7 +107,7 @@ def main(argv=sys.argv[1:]):
     ld = generate_launch_description()
 
     test_error_codes_action = ExecuteProcess(
-        cmd=[os.path.join(os.getenv('TEST_DIR'), 'test_error_codes.py')],
+        cmd=[os.getenv('TEST_DIR' / , 'test_error_codes.py')],
         name='test_error_codes',
         output='screen',
     )
