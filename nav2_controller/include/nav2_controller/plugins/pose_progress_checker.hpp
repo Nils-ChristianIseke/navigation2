@@ -51,16 +51,21 @@ protected:
 
   double required_movement_angle_;
 
-  // Dynamic parameters handler
-  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr dyn_params_handler_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_params_handler_;
   std::string plugin_name_;
-
   /**
-   * @brief Callback executed when a parameter change is detected
+   * @brief Callback executed when a parameter change is detected, checking if the parameter update is valid.
    * @param parameters list of changed parameters
    */
   rcl_interfaces::msg::SetParametersResult
-  dynamicParametersCallback(std::vector<rclcpp::Parameter> parameters);
+  validateParameterUpdatesCallback(std::vector<rclcpp::Parameter> parameters);
+
+  rclcpp::node_interfaces::PostSetParametersCallbackHandle::SharedPtr post_set_params_handler_;
+  /**
+   * @brief Callback executed when a parameter change is detected, updating the parameters.
+   * @param parameters list of changed parameters
+   */
+  void updateParametersCallback(std::vector<rclcpp::Parameter> parameters);
 };
 }  // namespace nav2_controller
 

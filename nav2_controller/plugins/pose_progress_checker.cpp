@@ -43,8 +43,8 @@ void PoseProgressChecker::initialize(
   node->get_parameter_or(plugin_name + ".required_movement_angle", required_movement_angle_, 0.5);
 
   // Add callback for dynamic parameters
-  dyn_params_handler_ = node->add_on_set_parameters_callback(
-    std::bind(&PoseProgressChecker::dynamicParametersCallback, this, _1));
+  on_set_params_handler_ = node->add_on_set_parameters_callback(
+    std::bind(&PoseProgressChecker::validateParameterUpdatesCallback, this, _1));
 }
 
 bool PoseProgressChecker::check(geometry_msgs::msg::PoseStamped & current_pose)
@@ -73,18 +73,35 @@ double PoseProgressChecker::poseAngleDistance(
 {
   return abs(angles::shortest_angular_distance(pose1.theta, pose2.theta));
 }
-
+void PoseProgressChecker::updateParametersCallback(
+  std::vector<rclcpp::Parameter> parameters)
+{
+  for (const auto & param : parameters) {
+    const auto & name = param.get_name();
+    const auto & type = param.get_type();
+    if (name == plugin_name_ + ".required_movement_angle" &&
+      type == ParameterType::PARAMETER_DOUBLE)
+    {
+      required_movement_angle_ = param.as_double();
+    }
+  }
+}
 rcl_interfaces::msg::SetParametersResult
-PoseProgressChecker::dynamicParametersCallback(std::vector<rclcpp::Parameter> parameters)
+PoseProgressChecker::validateParameterUpdatesCallback(std::vector<rclcpp::Parameter> parameters)
 {
   rcl_interfaces::msg::SetParametersResult result;
   for (auto parameter : parameters) {
     const auto & type = parameter.get_type();
     const auto & name = parameter.get_name();
-
-    if (type == ParameterType::PARAMETER_DOUBLE) {
-      if (name == plugin_name_ + ".required_movement_angle") {
-        required_movement_angle_ = parameter.as_double();
+    {
+      if (name == plugin_name_ + ".required_movement_angle" &&
+        type == ParameterType::PARAMETER_DOUBLE &&
+        (parameter.as_double() <= 0.0 || parameter.as_double() >= 2 * M_PI))
+      {
+        result.successful = false;
+        result.reason = "The value required_movement_angle is incorrectly set, "
+          "it should be 0 < required_movement_angle < 2PI. Ignoring parameter update.";
+        return result;
       }
     }
   }
