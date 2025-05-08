@@ -14,13 +14,17 @@ class Navigation2:
         return (
             dag.container()
             .from_("ros:rolling")
+            .with_exec(["bash", "-c", "source /opt/ros/rolling/setup.bash"])
+            .terminal()
+            .with_exec(["bash", "-c", "apt update -y"])
+            .with_exec(["bash", "-c", "apt install -y iputils-ping"])
+            .terminal()
             .with_directory("/", source)
         )
     @function
     def build_ros(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
         return (
             self.prepare_container(source)
-            .with_exec(["bash", "-c", "source /opt/ros/rolling/setup.bash"])
             .with_exec(["bash", "-c", "colcon build"])
         )
     @function
@@ -28,6 +32,7 @@ class Navigation2:
         return (
             self.build_ros(source)
             .with_exec(["bash", "-c", "colcon test"])
+            .with_terminal()
         )
     @function
     def lint(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
