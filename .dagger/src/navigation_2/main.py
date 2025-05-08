@@ -1,11 +1,6 @@
 import dagger
-from dagger import dag, function, object_type
+from dagger import dag, function, object_type, DefaultPath
 from typing import Annotated
-
-
-
-from dagger import dag, function, DefaultPath 
-import sys
 
 @object_type
 class Navigation2:
