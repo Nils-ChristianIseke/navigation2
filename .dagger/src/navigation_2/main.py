@@ -10,21 +10,20 @@ import sys
 @object_type
 class Navigation2:
     @function
-    def prepare_container(self,source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
+    def showcase_dagger_debugging(self,source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
         return (
             dag.container()
             .from_("ros:rolling")
-            .with_exec(["bash", "-c", "source /opt/ros/rolling/setup.bash"])
             .terminal()
             .with_exec(["bash", "-c", "apt update -y"])
             .with_exec(["bash", "-c", "apt install -y iputils-ping"])
-            .terminal()
             .with_directory("/", source)
+            .terminal()
         )
     @function
     def build_ros_packages(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
         return (
-            self.prepare_container(source)
+            self.showcase_dagger_debugging(source)
             .with_exec(["bash", "-c", "colcon build"])
         )
     @function
