@@ -22,20 +22,20 @@ class Navigation2:
             .with_directory("/", source)
         )
     @function
-    def build_ros(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
+    def build_ros_packages(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
         return (
             self.prepare_container(source)
             .with_exec(["bash", "-c", "colcon build"])
         )
     @function
-    def test_ros(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
+    def test_ros_packages(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
         return (
-            self.build_ros(source)
+            self.build_ros_packages(source)
             .with_exec(["bash", "-c", "colcon test"])
             .with_terminal()
         )
     @function
-    def lint(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
+    def run_pre_commit(self, source: Annotated[dagger.Directory, DefaultPath("/")]) -> dagger.Container:
         return (
             dag.container().from_("jfxs/pre-commit")
             .with_directory("/", source)
